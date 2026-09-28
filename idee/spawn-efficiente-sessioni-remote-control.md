@@ -112,6 +112,36 @@ sessioni toccano lo stesso repo. Questa parte resta un'evoluzione
 opzionale: il pattern "orchestratore + tmux" sopra è già sufficiente a
 risolvere il problema descritto senza costruire nulla.
 
+## Prior art: strumenti già esistenti che risolvono questo problema
+
+Prima di costruire qualunque cosa custom, vale la pena valutare progetti
+open source che fanno già esattamente questo:
+
+- **Happy / Happy Coder** — [github.com/slopus/happy](https://github.com/slopus/happy),
+  [happy.engineering](http://happy.engineering/). Client mobile/web
+  end-to-end criptato per Claude Code e Codex. Sul PC si lancia `happy`
+  al posto di `claude`; quando serve controllo da remoto la sessione
+  riparte in "remote mode".
+- **Happier** — [github.com/happier-dev/happier](https://github.com/happier-dev/happier),
+  [happier.dev](https://happier.dev/). Fork/evoluzione più ampia, con
+  supporto a 13 agenti (Claude Code, Codex, Cursor, Gemini, ecc.). Qui il
+  problema che stiamo descrivendo è già risolto nativamente: si installa
+  un **daemon** sempre acceso sul PC (`happier`), e dall'app si preme
+  *"New session"*, si sceglie **macchina → cartella → agente**, e il
+  daemon locale la avvia — nessun terminale da aprire a mano. In più
+  offre creazione automatica di **git worktree** per isolare sessioni
+  sullo stesso repo, notifiche push per richieste di permesso, e setup
+  anche via SSH su macchine remote (`happier machine setup --ssh
+  user@host`).
+
+Il daemon di Happy/Happier gioca esattamente il ruolo del "sessione
+orchestratore" descritto sopra, ma pre-costruito, con pairing sicuro
+(QR code) e crittografia end-to-end invece di gestione manuale. Per la
+maggior parte dei casi conviene adottare uno di questi due invece di
+costruire il pattern manuale o il fleet manager: il pattern
+"orchestratore + tmux/Start-Process" resta utile solo come soluzione
+zero-dipendenze quando non si vuole installare un tool di terze parti.
+
 ## Rischi / domande aperte
 
 - **Sicurezza**: l'orchestratore, essendo sempre acceso in remote
@@ -137,5 +167,10 @@ risolvere il problema descritto senza costruire nulla.
    Remote Control (dal telefono) di aprire un progetto con
    `claude remote-control` diretto e verificare che la nuova sessione
    compaia e sia controllabile dalla Claude Code app.
-3. Solo se il pattern manuale risulta insufficiente, valutare il fleet
-   manager descritto come estensione futura.
+3. Provare **Happier** (o Happy) come soluzione pronta all'uso e
+   confrontarla col pattern manuale: se copre già naming, worktree e
+   spawn on-demand da remoto, non ha senso costruire un fleet manager
+   custom.
+4. Solo se Happy/Happier non fossero adatti (per policy di sicurezza,
+   necessità di non installare tool di terze parti, ecc.), valutare il
+   fleet manager descritto come estensione futura del pattern manuale.
