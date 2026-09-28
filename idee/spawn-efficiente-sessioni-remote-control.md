@@ -195,3 +195,26 @@ agenti.
 4. Solo se Happy/Happier non fossero adatti (per policy di sicurezza,
    necessità di non installare tool di terze parti, ecc.), valutare il
    fleet manager descritto come estensione futura del pattern manuale.
+
+## Guida di setup rapida — Happier
+
+1. **Installa il CLI/daemon sul PC.**
+   - Windows (PowerShell): `iwr https://happier.dev/install.ps1 -useb | iex`
+   - macOS/Linux: `curl -fsSL https://happier.dev/install | bash`
+   - In alternativa: app desktop da `happier.dev/download` (macOS/Windows/Linux),
+     configura da sola CLI + daemon.
+2. **Pairing col telefono.** Avvia l'app desktop (o il login del CLI): mostra
+   un QR code. Installa l'app mobile "Happier" (App Store / Google Play),
+   fai login con lo stesso account e scansiona il QR.
+3. **Avvia una sessione.**
+   - Da terminale locale: `cd <cartella progetto>` poi `happier` al posto
+     di `claude`.
+   - Da telefono, senza toccare il PC: app → **"New session"** → scegli
+     macchina → cartella → agente (Claude Code) → parte da remoto.
+4. **Macchine remote via SSH (opzionale).**
+   `happier machine setup --ssh user@host`, oppure, se la macchina remota
+   non ha accesso browser: `happier auth pair-remote --ssh user@host`.
+
+Nota: questi comandi vanno eseguiti sul PC/telefono dell'utente, non da
+una sessione Claude Code Remote in un container cloud (che non ha
+accesso a quella macchina).
