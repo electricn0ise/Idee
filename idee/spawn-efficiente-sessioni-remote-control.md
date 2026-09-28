@@ -47,6 +47,17 @@ cui unico compito è aprire le altre sessioni per conto dell'utente:
    stesso può anche solo *pilotare* quella sessione via tmux
    (`tmux send-keys`) senza che l'utente debba aprirne un'altra a mano.
 
+**Perché serve tmux (o equivalente) e non un semplice `&` in background:**
+un processo lanciato solo in background dalla shell dell'orchestratore è
+figlio di quella chiamata di comando e tende a morire (SIGHUP) quando la
+chiamata termina, oltre a non avere un vero terminale (pty) a cui Claude
+Code, essendo una CLI interattiva, si aspetta di essere agganciato. tmux
+risolve entrambi i problemi: fornisce un pty persistente e indipendente
+dal processo che l'ha avviato, quindi la sessione sopravvive e resta
+riattaccabile. `screen` è un'alternativa equivalente; un servizio
+systemd/launchd con pty dedicato è più solido ma più complesso da
+configurare.
+
 Vantaggi: zero nuovi servizi da installare, zero problemi di sicurezza
 aggiuntivi (si usa lo stesso meccanismo di Remote Control già esistente,
 solo un'unica volta come "punto di ingresso"), e risolve esattamente il
