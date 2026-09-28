@@ -142,6 +142,27 @@ costruire il pattern manuale o il fleet manager: il pattern
 "orchestratore + tmux/Start-Process" resta utile solo come soluzione
 zero-dipendenze quando non si vuole installare un tool di terze parti.
 
+### Happy vs Happier: quale scegliere
+
+| | Happy / Happy Coder | Happier |
+|---|---|---|
+| Origine | Progetto originale | Nato come contributo a Happy, poi separato per iterare più veloce |
+| Maturità | ~23.9k star, ~2.5k commit — più maturo/rodato | ~1.8k star, ma 10.7k+ commit — sviluppo molto più rapido |
+| Agenti supportati | Solo Claude Code + Codex | 30+ agenti via ACP (Claude Code, Codex, Cursor, Gemini, ecc.) |
+| Git worktree per sessione | Non menzionato nella documentazione | Sì, nativo |
+| Spawn multi-macchina da app | Sì | Sì, pensato esplicitamente per gestire tante sessioni parallele su più macchine |
+| App mobile | Più matura/nativa, voice control | Setup guidato (l'app desktop configura CLI e daemon da sola) |
+| Licenza | MIT | MIT |
+
+**Raccomandazione per questo caso d'uso (spawnare sessioni multiple da
+remoto isolate tra loro):** **Happier**, perché copre nativamente sia lo
+spawn on-demand ("New session" → macchina/cartella/agente) sia
+l'isolamento tra sessioni sullo stesso repo via git worktree, che è
+proprio il rischio segnalato più sopra. Happy resta preferibile solo se
+si usa esclusivamente Claude Code/Codex e si preferisce il prodotto più
+maturo e con l'app mobile più rodata, senza bisogno di worktree o altri
+agenti.
+
 ## Rischi / domande aperte
 
 - **Sicurezza**: l'orchestratore, essendo sempre acceso in remote
