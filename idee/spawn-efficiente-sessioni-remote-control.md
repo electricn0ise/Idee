@@ -58,6 +58,25 @@ riattaccabile. `screen` è un'alternativa equivalente; un servizio
 systemd/launchd con pty dedicato è più solido ma più complesso da
 configurare.
 
+**Validato in pratica (test su Windows).** Un tentativo reale ha
+confermato la teoria: il tool Bash/PowerShell della sessione orchestratore
+gira con stdin collegato a `null` e nessun TTY, quindi lanciare `claude`
+interattivo da lì fallisce subito o resta bloccato — esattamente il
+problema descritto sopra. Su Windows l'equivalente di tmux è aprire una
+finestra/processo indipendente con PID proprio e una vera console:
+```powershell
+Start-Process powershell -ArgumentList '-NoExit','-Command','cd "<cartella>"; claude remote-control'
+```
+Punto importante: conviene lanciare **direttamente `claude remote-control`**
+(non `claude` seguito da `/rc` digitato a mano), così la sessione nasce
+già registrata in remote control fin dal primo istante, senza bisogno di
+interagire con la finestra dopo l'apertura. Questo elimina anche il falso
+problema di "non posso leggere l'output né inviare input a quella
+finestra": l'orchestratore non deve pilotare la sessione figlia via
+stdin/stdout — la verifica e il controllo avvengono tramite il
+meccanismo di Remote Control stesso (la sessione compare nella Claude
+Code app ed è lì che la si guida), non tramite l'orchestratore.
+
 Vantaggi: zero nuovi servizi da installare, zero problemi di sicurezza
 aggiuntivi (si usa lo stesso meccanismo di Remote Control già esistente,
 solo un'unica volta come "punto di ingresso"), e risolve esattamente il
@@ -108,11 +127,15 @@ risolvere il problema descritto senza costruire nulla.
 
 ## Prossimi passi (per una sessione di implementazione)
 
-1. Verificare in pratica che una sessione Claude Code possa lanciare
-   comandi `tmux new-session` e che le sessioni tmux risultanti restino
-   vive e riattaccabili dopo la chiusura del terminale originale.
-2. Provare il giro completo: chiedere all'orchestratore via Remote
-   Control (dal telefono) di aprire un progetto e verificare che compaia
-   una nuova sessione controllabile.
+1. ~~Verificare in pratica che una sessione Claude Code possa lanciare un
+   processo detached indipendente (tmux su Linux/macOS, `Start-Process`
+   su Windows) che resti vivo e controllabile dopo la chiusura del
+   comando/terminale originale.~~ Confermato su Windows con
+   `Start-Process` + `claude remote-control`. Da confermare allo stesso
+   modo con tmux/screen su Linux/macOS.
+2. Provare il giro completo end-to-end: chiedere all'orchestratore via
+   Remote Control (dal telefono) di aprire un progetto con
+   `claude remote-control` diretto e verificare che la nuova sessione
+   compaia e sia controllabile dalla Claude Code app.
 3. Solo se il pattern manuale risulta insufficiente, valutare il fleet
    manager descritto come estensione futura.
