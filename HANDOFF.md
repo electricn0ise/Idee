@@ -58,6 +58,27 @@ Perché questa scelta e non le altre:
 **Piano d'acquisto a fasi (riduce il rischio di comprare tutto prima di sapere se funziona):**
 - **ALTERNATIVA SENZA DIY (da valutare per prima, perché l'utente non ha saldatore né ESP32 e giudica il DIY complicato):** esistono **sensori di pressione Zigbee già pronti**, strisce sottili da mettere sotto il materasso, in versione **40 e 80 cm** (l'80 cm è quella indicata per i letti), alimentati da una **CR2032** (fino a circa un anno), "Tuya Zigbee Seat Pressure Sensor" (Zigbee2MQTT lo elenca come "TS0601 bed presence sensor"). Il negozio olandese Slimhuisje (prezzo non trovato) dichiara compatibilità con Zigbee2MQTT e ZHA; SmartHomeScene lo indica come reperibile solo su AliExpress. Elimina ESP32, ADS1115, resistori, saldature, ESPHome e tarature analogiche; l'utente ha già Zigbee/ZHA. Limiti noti dalle fonti: con **materassi duri a molle** serve più pressione (meglio schiuma/lattice); molto **sensibile ai movimenti** nel letto (servirà il debounce sull'uscita); uscita **binaria**, niente dati di forza da tarare; per i due lati ne servono **due da 80 cm** (uno per lato). **Da verificare prima di comprare:** supporto reale in **ZHA** (i dispositivi Tuya TS0601 spesso richiedono un quirk), tipo di materasso dell'utente, prezzo e tempi di consegna in Italia. Se funziona bene, il piano FSR diventa un ripiego e questo handoff va semplificato (livello 1 = due binary_sensor Zigbee).
 - **AGGIORNAMENTO PRECEDENTE: Interlink con spedizione costa $129 (riferito dall'utente), quindi si scartano Interlink diretto e la UX.** Nei negozi UE trovati la UX non c'è: l'unica serie "lunga" con range superiore alla classica reperibile in UE è la **FSR X 408 (0,3–50 N)**, venduta da **OpenELAB a €2,75 per il 300 mm** (spedizione €4,95–7,95). Piano: **4 × X 408 300 mm (circa €11 + spedizione)**, due per lato sulla stessa doga, in fila a coprire circa 60 cm, collegate in parallelo allo stesso canale ADC (da provare). Se i dati mostrano saturazione con la persona a letto, rimedi in ordine: (1) abbassare il resistore di carico del partitore per spostare la sensibilità verso forze alte (tecnica comune, da verificare); (2) ridurre meccanicamente la forza sulla striscia (es. strato che ripartisce il carico); (3) solo allora riconsiderare la UX. La classica 610 mm da Tinytronics (€25) è utile solo come riferimento di confronto, non come primo acquisto.
+- **Preventivo del piano FSR (prezzi da ricerche web, i marcati "stima" non sono verificati; l'utente ha dichiarato di apprezzare la manualità e non ha saldatore):**
+
+  | Voce | Prezzo | Note |
+  |---|---|---|
+  | 4 × FSR X 408 300 mm (OpenELAB) | €11,00 | verificato (€2,75 l'una) |
+  | ESP32-DevKitC | €10,90–15,99 | SOS Electronic / AZ-Delivery |
+  | ADS1115 | €3,50–13,37 | OpenELAB a €6,49 ma **esaurito**; generico da eBay.de circa €3,50; Farnell €13,37 |
+  | Kit resistori 1% | €4,50–7,00 | eBay.de / negozio NL |
+  | Condensatori ceramici 100 nF | €3–5 | stima |
+  | Cavetti Dupont (OpenELAB) | €3,25–5,01 | verificato |
+  | Breadboard MB-102 (OpenELAB) | da €9,34 | verificato |
+  | Cavo bipolare sottile 2–3 m per lato | €3–6 | stima |
+  | Nastro Kapton / guaina termorestringente | €3–6 | stima |
+  | Nastro biadesivo/di carta | €2–3 | stima |
+  | Spedizione OpenELAB | €4,95–7,95 | altre spedizioni non verificate (fino a circa €10) |
+  | **Subtotale materiali** | **circa €58–100** | |
+  | Saldatore a temperatura regolabile con stagno | €34,88–49,99 | ManoMano; attrezzo riusabile |
+  | Multimetro (opzionale) | €18,74–27,70 | opzionale: ESPHome registra già la tensione dell'ADS1115 |
+  | **Totale con saldatore** | **circa €93–150**; con multimetro **circa €112–177** | USB e alimentatore: si presume già in casa |
+
+  Tipicamente il cavo USB corretto e un caricabatterie da telefono bastano per alimentare l'ESP32.
 - **Lista acquisti completa per il test (BOM), oltre alle strisce:**
   - **Da OpenELAB** (confermati dalla ricerca come presenti in catalogo; prezzi non verificati): modulo ADS1115 (versione generica "ADC Module 16 bit 4 channels" o Gravity di DFRobot, la seconda probabilmente più cara), cavetti Dupont (40 pin F-F e M-F), breadboard MB-102, cavi USB-USB-C. Non confermati in catalogo: ESP32-DevKitC, resistori e condensatori, morsettiere, alimentatore USB. Controllare direttamente il sito per questi.
   - **Collegamento delle strisce (da non dimenticare):** la FSR X 408 ha piazzole da saldare sensibili al calore. Serve un saldatore con punta a bassa temperatura e saldatura rapida, oppure connettori a crimp/pinzette a coccodrillo per il test. Isolare con nastro Kapton o guaina termorestringente.
