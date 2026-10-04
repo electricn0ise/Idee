@@ -2,6 +2,7 @@
 
 > Stato: **hardware deciso, in attesa di acquisto e verifica sul campo. Poi pronta per la sessione di implementazione.**
 > Nessuna implementazione è stata eseguita in questo branch, solo progettazione.
+> **Fase corrente (decisione utente): ci si occupa prevalentemente di scelta, ricerca, valutazione e acquisto dell'hardware** (sez. 3). Logica HA, automazioni e fase 2 restano per dopo.
 
 ## 1. Obiettivo
 
@@ -40,11 +41,25 @@ Perché questa scelta e non le altre:
 | Radar con zone (Aqara FP2, LD2450) | Scartata come sensore principale: stessa famiglia del sensore già in casa; per l'FP2 alcuni utenti HA riportano difficoltà a rilevare chi dorme e una precisione sull'assenza molto inferiore a quella sulla presenza. |
 | Secondo SNZB-06P o simile | Scartata: darebbe lo stesso segnale binario di camera. |
 
-**Lista acquisti (quantità consigliate, prezzi non verificati, ordine di grandezza: poche decine di euro in tutto):**
-- 1 × scheda ESP32 (con Wi-Fi e USB; usare pin ADC1 per la lettura analogica perché gli ADC2 non sono utilizzabili con Wi-Fi attivo).
-- FSR **a larga area** (strisce o quadrati grandi, non i piccoli dischi da 1 cm): **almeno 2 per lato, 4 totali; conviene comprarne 6 per margine** e per provare posizioni diverse.
-- Resistori fissi per il partitore di tensione di ciascun FSR (valore da scegliere in fase di taratura), cavi, nastro adesivo di carta / biadesivo, alimentatore USB per l'ESP32 vicino al letto.
+**Candidati concreti e prezzi trovati in ricerca (da riverificare al momento dell'acquisto, cambiano e le disponibilità sono basse):**
+
+| Componente | Candidato | Prezzo trovato | Note |
+|---|---|---|---|
+| FSR striscia lunga | Interlink **FSR 408** (24" × 0.4", cioè circa 61 cm × 1,5 cm, area sensibile continua) | Melopero (IT) **€27,97**, solo 2 pezzi in stock; RobotShop EU **€20,69**; Adafruit **$19,95** (USA, + spedizione/dogana) | Alcuni rivenditori lo danno come fuori produzione. Esistono anche le varianti "FSR UX 408" a lunghezza 300/400 mm direttamente da Interlink (prezzo non verificato). |
+| FSR quadrato | Interlink **FSR 406** (area attiva 39,6 mm quadrata) | Melopero (IT) **€11,74** | Area piccola: più dipendente dalla posizione. Più economico. |
+| ESP32 | **ESP32-DevKitC** (o equivalente, anche AZ-Delivery) | da **€10,90** (SOS Electronic) a €10,99–15,99 (AZ-Delivery) | Basta una scheda con Wi-Fi e USB. Usare pin **ADC1**: gli ADC2 non sono utilizzabili con Wi-Fi attivo. |
+| ADC esterno (opzionale, consigliato) | **ADS1115** 16 bit, 4 canali, I2C | circa **€3,50** (modulo semplice) fino a ~€16 | Meno rumore dell'ADC interno dell'ESP32, che è non lineare. Per sola soglia presenza non è indispensabile, ma costa poco. |
+| Alternativa DIY economica | Velostat + nastro di alluminio/rame | meno di 1 € a sensore (fonti community; prezzo materiali non verificato) | Segnalate forti oscillazioni di tensione quando ci si gira nel letto; ok per esperimenti, meno per produzione. |
+| Accessori | resistori fissi per il partitore (valore da tarare, circa 10 kΩ come punto di partenza), cavi, nastro di carta/biadesivo, alimentatore USB per l'ESP32 | pochi euro | Resistori a precisione 1% e condensatore ceramico 100 nF sull'ingresso analogico come buona pratica. |
+
+**Piano d'acquisto a fasi (riduce il rischio di comprare tutto prima di sapere se funziona):**
+- **Fase A, test minimo (≈ €60–80):** 1 ESP32 + 1 ADS1115 + **2 × FSR 408** (uno per lato, su una doga sotto busto/fianchi) + accessori. Obiettivo: verificare che `qualcuno_a_letto` sia affidabile e capire se i due lati si separano.
+- **Fase B, se la A funziona:** aggiungere un secondo FSR per lato (su un'altra doga) per robustezza alla posizione (≈ +€40–56).
+- **Esperimento parallelo opzionale (≈ €10–15):** una striscia DIY in Velostat da confrontare con gli FSR, solo per curiosità/ripiego.
+- Il costo totale prima stimato "poche decine di euro" era ottimistico: con FSR a larga area realistico ≈ **€60–80 per la fase A**, ≈ **€100–140** con 4 strisce.
 - Verificare la copertura Wi-Fi in camera.
+
+**Limiti di questa ricerca:** non sono riuscito ad aprire i thread della community HA (accesso bloccato), quindi la scelta del modello/dimensione FSR si basa su snippet di ricerca e non sulla lettura integrale delle esperienze. Prima dell'acquisto vale la pena rileggere "FSR - the best bed occupancy sensor" e "Bed occupancy DIY sensor" su community.home-assistant.io per confermare modello, dimensioni e posizione sulle doghe.
 
 **Montaggio (da provare, l'implementazione decide):** FSR fissati alle doghe con nastro di carta o sul lato inferiore delle doghe, uno o due per lato nella zona busto/fianchi. Se il segnale è debole o dipendente dalla posizione, provare l'altra posizione e/o parallelo di più FSR.
 
@@ -83,7 +98,7 @@ Livello 4 (fase 2): "dormendo"
 1. **`unavailable`/`unknown` non è "fuori dal letto".** Se un sensore o l'ESP32 è offline, l'aggregato deve diventare `unknown`, non `off`. Le automazioni di sicurezza (arma allarme, spegni tutto) non devono scattare su `unknown`.
 2. **Isteresi sempre** sui segnali numerici; mai confrontare `> X` secco.
 3. **Calibrazione:** la soglia dipende da materasso, doghe e posizione degli FSR. Va documentata e modificabile (opzione dell'helper o `input_number`), non cablata.
-4. **Animali/bambini:** decidere se contano. Con la sola pressione un animale pesante può superare la soglia: usare soglia in peso relativa e/o il controllo incrociato.
+4. **Animali:** l'utente non ne ha in casa, quindi non serve gestirli. Se cambiasse, con la sola pressione un animale pesante può superare la soglia.
 5. **Lati su letto matrimoniale:** la separazione per lato non è garantita (la community segnala che la risoluzione sulle doghe è la parte difficile). **Criterio minimo di successo = `qualcuno_a_letto` affidabile.** I singoli lati sono best effort: se la separazione non è pulita dopo la taratura, tenere solo l'aggregato e non vincolare automazioni ai singoli lati.
 6. **Controllo incrociato con la camera:** se il letto risulta occupato ma `binary_sensor.sonoff_snzb_06p` è `off` per più di un tempo ragionevole, trattare come anomalia (aggregato `unknown`), non come "a letto". L'inverso (camera `on`, letto vuoto) è normale.
 7. **Una sola fonte di verità:** le automazioni usano `binary_sensor.qualcuno_a_letto` / `tutti_a_letto`, mai i sensori grezzi.
@@ -119,13 +134,17 @@ Già risolte:
 - ~~Tipo di letto~~ → matrimoniale a doghe.
 - ~~Preferenza contatto/non contatto~~ → indifferente, conta il risultato.
 
+Risolte dopo:
+- ~~Persone nel letto~~ → di norma **una**, a volte **due**. `tutti_a_letto` ha quindi senso solo come "tutte le persone presenti", da definire in implementazione; la modalità normale è una persona (conta `qualcuno_a_letto`).
+- ~~Animali~~ → **no**. Si può non gestire il caso animale (regola 4 della sez. 5 declassata).
+- ~~Accesso API/MCP a HA~~ → **sì**, l'implementazione può creare gli helper.
+- ~~Fase 2 ("dormendo")~~ → **dopo**. Implementare solo i livelli 1-3.
+- ~~Integrazione con "Sveglia potenziata"~~ → per ora **fuori scope**: ci si occupa di scelta/acquisto hardware.
+
 Ancora aperte:
-1. **Quante persone dormono nel letto** (una sola o due?). Decide se `tutti_a_letto` ha senso o coincide con `qualcuno_a_letto`.
-2. **Animali** che salgono sul letto?
-3. **Cosa deve far scattare** lo stato (luci, riscaldamento, allarme, aspirapolvere)? Influisce su ritardi e gestione di `unknown`.
-4. **Accesso API/MCP a HA** per creare gli helper dall'implementazione, altrimenti gli step diventano istruzioni manuali.
-5. **Fase 2 ("dormendo")** subito o dopo? Se dopo, implementare solo i livelli 1-3.
-6. **Integrazione con "Sveglia potenziata":** in futuro il sensore letto potrebbe rafforzare il suo dismiss/failsafe ("a letto" è più preciso di "in camera"). Fuori da questo progetto: se si vuole, va deciso a parte con le sue regole di modifica.
+1. **Cosa deve far scattare** lo stato (luci, riscaldamento, allarme, aspirapolvere...): **"svariate cose, da definire dopo"**. Non blocca l'acquisto.
+2. **Budget massimo** per la fase A e se ordinare da rivenditori italiani/UE (Melopero, RobotShop EU, SOS Electronic, AZ-Delivery) o da USA (Adafruit: più economico ma spedizione/dogana). Da confermare con l'utente.
+3. **Quale striscia FSR** (408 contro 406) in base alla rilettura dei thread community (sez. 3, "Limiti di questa ricerca").
 
 ## 9. Piano di implementazione suggerito
 
