@@ -2,6 +2,7 @@
 
 > Destinatario: sessione Claude Code **locale** (con accesso a Home Assistant via API/MCP e, se disponibile, a Notion) che lavora **insieme all'utente**, presente fisicamente in camera.
 > Contesto completo e storico delle decisioni: `HANDOFF.md` nello stesso branch (`claude/dazzling-wright-p6vc4a`). Questo file contiene solo ciò che serve per eseguire il lavoro.
+> **Attività Notion corrispondente (fonte operativa per la sessione locale, con presa in carico e regole del Sistema Memoria):** https://app.notion.com/p/3f2d8c414014819f832bf50b22f9a88e — creata il 2026-10-07 nel DB 📋 Attività, progetto Home Assistant, senza sotto-progetto. In caso di differenze tra i due documenti, vale la versione più recente; il corpo Notion contiene anche le regole del Protocollo HA e il vincolo sulla mesh Zigbee sotto diagnosi, emersi dopo la stesura di questo file.
 > Stato: il sensore è **arrivato** (2026-10-07). Nessuna configurazione è stata ancora fatta. Lingua con l'utente: italiano.
 
 ## 1. Obiettivo
