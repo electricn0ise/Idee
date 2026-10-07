@@ -2,6 +2,7 @@
 
 > Stato: **SNZB-06P24 ordinato dall'utente (data: 2026-10-04 circa); in attesa di arrivo e prova di accettazione sul campo. Ripiego in ordine: celle di carico sotto le gambe, poi LD2410C con ESPHome. Poi pronta per la sessione di implementazione.**
 > Nessuna implementazione è stata eseguita in questo branch, solo progettazione.
+> **Per la sessione locale che mette in servizio il sensore SNZB-06P24 (arrivato il 2026-10-07) usare `HANDOFF-SNZB-06P24-SETUP.md`**: contiene solo i passi operativi, le prove e il go/no-go. Questo file resta il documento di contesto e storico.
 > **Fase corrente (decisione utente): ci si occupa prevalentemente di scelta, ricerca, valutazione e acquisto dell'hardware** (sez. 3). Logica HA, automazioni e fase 2 restano per dopo.
 
 ## 1. Obiettivo
